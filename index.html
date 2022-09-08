@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritimo RSA</title>
+
+    <!-- Material -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://peterolson.github.io/BigInteger.js/BigInteger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/big-integer/1.6.51/BigInteger.min.js"
+        integrity="sha512-gHNUM5lAKXJFwUX0qjNGL5tJSoa8TTz2xUTw5COytE/p3MHy2Mivey3Gb76Blf6JfvNglTskVo5YsxDix6XIcg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper" style="padding-left: 10px;">
+            <span href="#!" class="brand-logo">
+                <i class="material-icons">key</i>
+                RSA Criptografia Assimétrica
+            </span>
+        </div>
+    </nav>
+    <div style="padding: 10px;">
+        <div class="col s12 m7">
+            <div class="card horizontal">
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="col">
+                                <h5>Chaves Privadas</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s4">
+                                <input placeholder="Chave P" id="p" type="number" disabled>
+                                <label for="key_1_p">Chave P</label>
+                            </div>
+                            <div class="input-field col s4">
+                                <input placeholder="Chave Q" id="q" type="number" disabled>
+                                <label for="key_2_q">Chave Q</label>
+                            </div>
+                            <div class="input-field col s4">
+                                <input placeholder="Chave D" id="d" type="number" disabled>
+                                <label for="key_2_q">Chave D</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Chaves Públicas</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input placeholder="Chave E" id="e" type="number" disabled>
+                                <label for="key_1_p">Chave E</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input placeholder="Chave N" id="n" type="number" disabled>
+                                <label for="key_2_q">Chave N</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col">
+                                <div id="generateKeys" class="waves-effect waves-light btn"><i
+                                        class="material-icons left">key</i>Gerar Chaves</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input placeholder="Mensagem" id="msg" type="text">
+                                <label for="first_name">Mensagem</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <div id="run" class="waves-effect waves-light btn"><i
+                                        class="material-icons left">key</i>Aplicar
+                                    RSA</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h4>Resultados</h4>
+                                <p id="message"></p>
+                                <p id="numberAscii"></p>
+                                <p id="cyphered"></p>
+                                <p id="decyphered" style="overflow-wrap: anywhere;"></p>
+                                <p id="textConvert"></p>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="module">
+    import { generateKeysRSA, runRSA } from './js/index.js'
+
+    let keys = {}
+
+    function truncate(input) {
+        if (input.length > 50) {
+            return input.substring(0, 50) + '...';
+        }
+        return input;
+    };
+
+    function cypher() {
+        var message = document.getElementById('msg').value
+        keys.message = message
+        let response = runRSA(keys)
+
+        document.getElementById('message').innerHTML = `Mensagem: ${message}`
+        document.getElementById('numberAscii').innerHTML = `Mensagem em ASCII: ${truncate(response.numberAscii.toString())}`
+        document.getElementById('numberAscii').setAttribute('title', response.numberAscii.toString())
+
+        document.getElementById('cyphered').innerHTML = `Mensagem Cifrada: ${truncate(response.cyphered.toString())}`
+        document.getElementById('cyphered').setAttribute('title', response.cyphered.toString())
+        document.getElementById('decyphered').innerHTML = `Mensagem Decifrada: ${truncate(response.decyphered.toString())}`
+        document.getElementById('decyphered').setAttribute('title', response.decyphered.toString())
+        document.getElementById('textConvert').innerHTML = `Mensagem Decodificada: ${response.textConvert}`
+    }
+
+    function generateKeysFront() {
+        generateKeysRSA()
+            .then(keysresp => {
+                keys = keysresp
+                document.getElementById('p').value = keys.p.toString()
+                document.getElementById('q').value = keys.q.toString()
+                document.getElementById('n').value = keys.n.toString()
+                document.getElementById('d').value = keys.d.toString()
+                document.getElementById('e').value = keys.e.toString()
+            })
+    }
+
+    const buttonGenerateKeys = document.getElementById('generateKeys')
+    buttonGenerateKeys.onclick = generateKeysFront
+
+    const buttonrun = document.getElementById('run')
+    buttonrun.onclick = cypher
+
+</script>
+
+</html>
